@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Temperatura do Servidor</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #1e293b, #64748b);
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      text-shadow: 2px 2px #334155;
+    }
+
+    .temperature-display {
+      background: #0f172a;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+
+    .temperature {
+      font-size: 4rem;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    .unit {
+      font-size: 1.5rem;
+    }
+
+    .footer {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #cbd5e1;
+    }
+  </style>
+</head>
+<body>
+  <h1>Temperatura Atual</h1>
+  <div class="temperature-display">
+    <p id="temperature" class="temperature">--</p>
+    <p class="unit">°C</p>
+  </div>
+  <div class="footer">Atualizando automaticamente a cada 5 segundos...</div>
+
+  <script>
+  // Função para buscar o valor armazenado no servidor
+  function fetchStoredValue() {
+  fetch('https://servidorparaesp32.onrender.com/temperatura') // URL do servidor
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Erro ao recuperar o valor armazenado');
+      }
+      return response.text(); // Resposta como texto
+    })
+    .then((data) => {
+      const temperatureElement = document.getElementById('temperature');
+      // Converte a resposta para número, se possível
+      const temperature = parseFloat(data);
+      if (!isNaN(temperature)) {
+        temperatureElement.textContent = `${temperature.toFixed(1)} °C`; // Exibe o valor como número com 2 casas decimais
+      } else {
+        temperatureElement.textContent = "--"; // Se o valor não for um número válido
+      }
+    })
+    .catch((error) => {
+      console.error('Erro ao consultar o valor armazenado:', error);
+      document.getElementById('temperature').textContent = "Erro ao recuperar";
+    });
+}
+
+// Atualizar o valor exibido a cada 5 segundos
+setInterval(fetchStoredValue, 5000);
+fetchStoredValue();
+  </script>
+</body>
+</html>
+
